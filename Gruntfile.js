@@ -8,7 +8,7 @@ module.exports = function(grunt) {
         complexity: {
             options: {
                 errorsOnly: false,
-                cyclomatic: 10,
+                cyclomatic: 20,
                 halstead: 30,
                 maintainability: 85
             },
@@ -24,12 +24,22 @@ module.exports = function(grunt) {
                     '!plugins/**/*.min.js'
                 ]
             }
+        },
+        uglify: {
+            options: {
+                mangle: false
+            },
+            my_target: {
+                files: {
+                    'mousetrap.min.js': ['mousetrap.js']
+                }
+            }
         }
     });
 
     grunt.loadNpmTasks('grunt-complexity');
-
+    grunt.loadNpmTasks('grunt-contrib-uglify');
     grunt.registerTask('default', [
-        'complexity'
+        'complexity', 'uglify'
     ]);
 };

@@ -17,7 +17,7 @@
  * Mousetrap is a simple keyboard shortcut library for Javascript with
  * no external dependencies
  *
- * @version 1.6.5
+ * @version 1.6.3
  * @url craig.is/killing/mice
  */
 (function(window, document, undefined) {
@@ -180,6 +180,23 @@
         }
 
         object.attachEvent('on' + type, callback);
+    }
+
+    /**
+     * cross browser remove event method
+     *
+     * @param {Element|HTMLDocument} object
+     * @param {string} type
+     * @param {Function} callback
+     * @returns void
+     */
+    function _removeEvent(object, type, callback) {
+        if (object.removeEventListener) {
+            object.removeEventListener(type, callback, false);
+            return;
+        }
+
+        object.detachEvent('on' + type, callback);
     }
 
     /**
@@ -885,6 +902,18 @@
             }
         };
 
+        /**
+         * destroy the instance, empty the binded callbacks
+         *
+         * @returns void
+         */
+        self.destroy = function() {
+            _removeEvent(targetElement, 'keypress', _handleKeyEvent);
+            _removeEvent(targetElement, 'keydown', _handleKeyEvent);
+            _removeEvent(targetElement, 'keyup', _handleKeyEvent);
+            self.reset();
+        };
+
         // start!
         _addEvent(targetElement, 'keypress', _handleKeyEvent);
         _addEvent(targetElement, 'keydown', _handleKeyEvent);
@@ -1029,7 +1058,7 @@
     Mousetrap.init = function() {
         var documentMousetrap = Mousetrap(document);
         for (var method in documentMousetrap) {
-            if (method.charAt(0) !== '_') {
+            if (method.charAt(0) !== '_' && method !== 'destroy') {
                 Mousetrap[method] = (function(method) {
                     return function() {
                         return documentMousetrap[method].apply(documentMousetrap, arguments);
